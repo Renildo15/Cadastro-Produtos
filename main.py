@@ -1,5 +1,6 @@
 from PyQt5 import uic,QtWidgets
 import mysql.connector
+from reportlab.pdfgen import canvas
 
 
 banco = mysql.connector.connect(
@@ -8,6 +9,44 @@ banco = mysql.connector.connect(
 	passwd = "",
 	database = "CADASTRO_PRODUTOS"
 )
+
+def gerar_pdf():
+	cursor = banco.cursor()
+	comando_SQL = "SELECT * FROM PRODUTOS"
+	cursor.execute(comando_SQL)
+	dados_lidos = cursor.fetchall()
+	y = 0
+	pdf = canvas.Canvas("Cadastro_Produtos.pdf")
+	pdf.setFont("Times-Bold", 25)
+	pdf.drawString(130,800, "PRODUTOS CADASTRADOS:")
+	pdf.setFont("Times-Bold", 10)
+
+	pdf.drawString(30,750,"ID")
+	pdf.drawString(70,750,"CÓDIGO")
+	pdf.drawString(130,750,"NOME")
+	pdf.drawString(210,750,"PREÇO")
+	pdf.drawString(270,750,"QUANT")
+	pdf.drawString(320,750,"D.VALIDADE")
+	pdf.drawString(400,750,"D.CADASTRO")
+	pdf.drawString(480,750,"CATEGORIA")
+
+	for i in range(0, len(dados_lidos)):
+		y = y + 50
+		pdf.drawString(30,750 - y, str(dados_lidos[i][0]))
+		pdf.drawString(70,750 - y, str(dados_lidos[i][1]))
+		pdf.drawString(130,750 - y, str(dados_lidos[i][2]))
+		pdf.drawString(210,750 - y, str(dados_lidos[i][3]))
+		pdf.drawString(270,750 - y, str(dados_lidos[i][4]))
+		pdf.drawString(320,750 - y, str(dados_lidos[i][5]))
+		pdf.drawString(400,750 - y, str(dados_lidos[i][6]))
+		pdf.drawString(480,750 - y, str(dados_lidos[i][7]))
+
+	pdf.save()
+	pdfmensagem.show()
+
+def fechar_Tela():
+	pdfmensagem.close()
+
 
 def main():
 	telaMenu.show()
@@ -89,12 +128,28 @@ def op_Excluir():
 	print("Excluir")
 
 def op_Imprimir():
-	print("Imprimir")
+	TelaImprimir.show()
+	telaMenu.close()
+
+	cursor = banco.cursor()
+	comando_SQL = "SELECT * FROM PRODUTOS"
+	cursor.execute(comando_SQL)
+	dados_lidos = cursor.fetchall()
+
+	TelaImprimir.tableWidget.setRowCount(len(dados_lidos))
+	TelaImprimir.tableWidget.setColumnCount(8)
+
+	for i in range(0, len(dados_lidos)):
+		for j in range(0, 8):
+			TelaImprimir.tableWidget.setItem(i,j,QtWidgets.QTableWidgetItem(str(dados_lidos[i][j])))
+
 
 app = QtWidgets.QApplication([])
-telaMenu = uic.loadUi("telamenu.ui")
-telaCadastro = uic.loadUi("telaCadastro.ui")
-listarDados = uic.loadUi("listarDados.ui")
+telaMenu = uic.loadUi("./Telas/telamenu.ui")
+telaCadastro = uic.loadUi("./Telas/telaCadastro.ui")
+listarDados = uic.loadUi("./Telas/listarDados.ui")
+TelaImprimir = uic.loadUi("./Telas/TelaImprimir.ui")
+pdfmensagem = uic.loadUi("./Telas/pdfmensagem.ui")
 
 
 #Menu principal
@@ -112,6 +167,12 @@ telaCadastro.pushButton.clicked.connect(op_Cadastrar)
 #Tela Listar
 
 listarDados.pushButton_2.clicked.connect(main)
+
+#Tela imprimir
+
+TelaImprimir.pushButton_3.clicked.connect(main)
+TelaImprimir.pushButton_2.clicked.connect(gerar_pdf)
+pdfmensagem.pushButton_3.clicked.connect(fechar_Tela)
 
 
 telaMenu.show()
