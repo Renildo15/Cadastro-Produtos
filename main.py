@@ -52,6 +52,8 @@ def main():
 	telaMenu.show()
 	telaCadastro.close()
 	listarDados.close()
+	TelaImprimir.close()
+	TelaBusca.close()
 
 def tela_Cadastrar():
 	telaCadastro.show()
@@ -121,6 +123,33 @@ def op_Listar():
 		for j in range(0, 8):
 			listarDados.tableWidget.setItem(i,j,QtWidgets.QTableWidgetItem(str(dados_lidos[i][j])))
 
+
+def op_Buscar():
+	TelaBusca.show()
+	telaMenu.close()
+
+def Buscar():
+	nome =TelaBusca.lineEdit.text()
+
+	if nome == "":
+		print("ERRO")
+
+	else:
+		cursor = banco.cursor()
+		comando_SQL = ("SELECT ID,CODIGO,NOME,PRECO,QUANTIDADE,DAT_VALIDADE,DAT_CADASTRO,CATEGORIA FROM PRODUTOS WHERE NOME = '{}'".format(nome))
+		cursor.execute(comando_SQL)
+		dados_lidos = cursor.fetchall()
+		print(dados_lidos)
+
+		TelaBusca.tableWidget.setRowCount(len(dados_lidos))
+		TelaBusca.tableWidget.setColumnCount(8)
+
+		for i in range(0, len(dados_lidos)):
+			for j in range(0, 8):
+				TelaBusca.tableWidget.setItem(i,j,QtWidgets.QTableWidgetItem(str(dados_lidos[i][j])))
+
+		TelaBusca.lineEdit.setText("")
+
 def op_Editar():
 	print("Editar")
 
@@ -143,6 +172,73 @@ def op_Imprimir():
 		for j in range(0, 8):
 			TelaImprimir.tableWidget.setItem(i,j,QtWidgets.QTableWidgetItem(str(dados_lidos[i][j])))
 
+def Busca_Categoria():
+	test =TelaBusca.lineEdit.text()
+
+	if test == "":
+		print("ERRO")
+
+	else:
+		cursor = banco.cursor()
+		comando_SQL = ("SELECT ID,CODIGO,NOME,PRECO,QUANTIDADE,DAT_VALIDADE,DAT_CADASTRO,CATEGORIA FROM PRODUTOS WHERE CATEGORIA = '{}'".format(test))
+		cursor.execute(comando_SQL)
+		dados_lidos = cursor.fetchall()
+		print(dados_lidos)
+
+		TelaBusca.tableWidget.setRowCount(len(dados_lidos))
+		TelaBusca.tableWidget.setColumnCount(8)
+
+		for i in range(0, len(dados_lidos)):
+			for j in range(0, 8):
+				TelaBusca.tableWidget.setItem(i,j,QtWidgets.QTableWidgetItem(str(dados_lidos[i][j])))
+		TelaBusca.lineEdit.setText("")
+	print("Categoria")
+
+def Busca_dtaVal():
+	test =TelaBusca.lineEdit.text()
+
+	if test == "":
+		print("ERRO")
+
+	else:
+		cursor = banco.cursor()
+		comando_SQL = ("SELECT ID,CODIGO,NOME,PRECO,QUANTIDADE,DAT_VALIDADE,DAT_CADASTRO,CATEGORIA FROM PRODUTOS WHERE DAT_VALIDADE = '{}'".format(test))
+		cursor.execute(comando_SQL)
+		dados_lidos = cursor.fetchall()
+		print(dados_lidos)
+
+		TelaBusca.tableWidget.setRowCount(len(dados_lidos))
+		TelaBusca.tableWidget.setColumnCount(8)
+
+		for i in range(0, len(dados_lidos)):
+			for j in range(0, 8):
+				TelaBusca.tableWidget.setItem(i,j,QtWidgets.QTableWidgetItem(str(dados_lidos[i][j])))
+		TelaBusca.lineEdit.setText("")
+	print("Data Validade")
+
+def Busca_dtaCad():
+
+	test =TelaBusca.lineEdit.text()
+
+	if test == "":
+		print("ERRO")
+
+	else:
+		cursor = banco.cursor()
+		comando_SQL = ("SELECT ID,CODIGO,NOME,PRECO,QUANTIDADE,DAT_VALIDADE,DAT_CADASTRO,CATEGORIA FROM PRODUTOS WHERE DAT_CADASTRO = '{}'".format(test))
+		cursor.execute(comando_SQL)
+		dados_lidos = cursor.fetchall()
+		print(dados_lidos)
+
+		TelaBusca.tableWidget.setRowCount(len(dados_lidos))
+		TelaBusca.tableWidget.setColumnCount(8)
+
+		for i in range(0, len(dados_lidos)):
+			for j in range(0, 8):
+				TelaBusca.tableWidget.setItem(i,j,QtWidgets.QTableWidgetItem(str(dados_lidos[i][j])))
+		TelaBusca.lineEdit.setText("")
+	print("Data Cadastro")
+
 
 app = QtWidgets.QApplication([])
 telaMenu = uic.loadUi("./Telas/telamenu.ui")
@@ -150,6 +246,7 @@ telaCadastro = uic.loadUi("./Telas/telaCadastro.ui")
 listarDados = uic.loadUi("./Telas/listarDados.ui")
 TelaImprimir = uic.loadUi("./Telas/TelaImprimir.ui")
 pdfmensagem = uic.loadUi("./Telas/pdfmensagem.ui")
+TelaBusca = uic.loadUi("./Telas/TelaBusca.ui")
 
 
 #Menu principal
@@ -173,6 +270,15 @@ listarDados.pushButton_2.clicked.connect(main)
 TelaImprimir.pushButton_3.clicked.connect(main)
 TelaImprimir.pushButton_2.clicked.connect(gerar_pdf)
 pdfmensagem.pushButton_3.clicked.connect(fechar_Tela)
+
+
+#Tela Busca
+
+TelaBusca.pushButton.clicked.connect(Buscar)
+TelaBusca.pushButton_2.clicked.connect(main)
+TelaBusca.pushButton_3.clicked.connect(Busca_Categoria)
+TelaBusca.pushButton_4.clicked.connect(Busca_dtaVal)
+TelaBusca.pushButton_5.clicked.connect(Busca_dtaCad)
 
 
 telaMenu.show()
