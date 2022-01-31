@@ -53,6 +53,7 @@ def main():
 	telaCadastro.close()
 	listarDados.close()
 	TelaImprimir.close()
+	telaEditar.close()
 	TelaBusca.close()
 
 def tela_Cadastrar():
@@ -151,7 +152,80 @@ def Buscar():
 		TelaBusca.lineEdit.setText("")
 
 def op_Editar():
-	print("Editar")
+	telaEditar.show()
+	telaMenu.close()
+
+	cursor = banco.cursor()
+	comando_SQL = "SELECT * FROM PRODUTOS ORDER BY ID"
+	cursor.execute(comando_SQL)
+	dados_lidos = cursor.fetchall()
+
+	telaEditar.tableWidget.setRowCount(len(dados_lidos))
+	telaEditar.tableWidget.setColumnCount(8)
+	telaEditar.tableWidget.setColumnWidth(0,20)
+	telaEditar.tableWidget.setColumnWidth(1,115)
+	telaEditar.tableWidget.setColumnWidth(2,125)
+	telaEditar.tableWidget.setColumnWidth(3,50)
+	telaEditar.tableWidget.setColumnWidth(4,20)
+	telaEditar.tableWidget.setColumnWidth(5,125)
+	telaEditar.tableWidget.setColumnWidth(6,125)
+	telaEditar.tableWidget.setColumnWidth(7,135)
+
+
+	telaEditar.tableWidget.verticalHeader().setVisible(False)
+	telaEditar.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+	telaEditar.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+	telaEditar.tableWidget.setStyleSheet("QTableView {selection-background-color:black;background-color:white;}")
+
+	for i in range(0, len(dados_lidos)):
+		for j in range(0, 8):
+			telaEditar.tableWidget.setItem(i,j,QtWidgets.QTableWidgetItem(str(dados_lidos[i][j])))
+
+def Editar():
+
+	global num_id
+	edicao.label_10.setText("")
+	linha = telaEditar.tableWidget.currentRow()
+	id_Produto = telaEditar.tableWidget.item(linha,0).text()
+
+	cursor = banco.cursor()
+	cursor.execute("SELECT * FROM PRODUTOS WHERE ID = "+ id_Produto)
+	produto = cursor.fetchall()
+	edicao.show()
+
+	num_id = id_Produto
+
+	edicao.lineEdit.setText(str(produto[0][0]))
+	edicao.lineEdit_2.setText(str(produto[0][1]))
+	edicao.lineEdit_3.setText(str(produto[0][2]))
+	edicao.lineEdit_4.setText(str(produto[0][3]))
+	edicao.lineEdit_5.setText(str(produto[0][4]))
+	edicao.lineEdit_6.setText(str(produto[0][5]))
+	edicao.lineEdit_7.setText(str(produto[0][6]))
+	edicao.lineEdit_8.setText(str(produto[0][7]))
+
+def Salvar():
+	global num_id
+	codigo = edicao.lineEdit_2.text()
+	nome = edicao.lineEdit_3.text()
+	preco = edicao.lineEdit_4.text()
+	qtd = edicao.lineEdit_5.text()
+	dta_val = edicao.lineEdit_6.text()
+	dta_cad = edicao.lineEdit_7.text()
+	categoria = edicao.lineEdit_8.text()
+
+
+	if codigo == "" or nome == "" or preco == "" or qtd == "" or categoria == "" or dta_val =="" or dta_cad == "":
+		edicao.label_10.setText("*PREENCHA TODOS OS CAMPOS")
+	else:
+		edicao.label_10.setText("")
+
+		cursor = banco.cursor()
+		cursor.execute("UPDATE PRODUTOS SET CODIGO = '{}', NOME = '{}', PRECO = '{}', QUANTIDADE = '{}', DAT_VALIDADE = '{}', DAT_CADASTRO = '{}', CATEGORIA = '{}' WHERE ID  = '{}'".format(codigo, nome, preco, qtd, dta_val, dta_cad, categoria, num_id))
+		edicao.close()
+		telaEditar.close()
+		op_Editar()
+
 
 def op_Excluir():
 	print("Excluir")
@@ -247,6 +321,8 @@ listarDados = uic.loadUi("./Telas/listarDados.ui")
 TelaImprimir = uic.loadUi("./Telas/TelaImprimir.ui")
 pdfmensagem = uic.loadUi("./Telas/pdfmensagem.ui")
 TelaBusca = uic.loadUi("./Telas/TelaBusca.ui")
+telaEditar = uic.loadUi("./Telas/telaEditar.ui")
+edicao = uic.loadUi("./Telas/edicao.ui")
 
 
 #Menu principal
